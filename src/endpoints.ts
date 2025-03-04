@@ -9,12 +9,12 @@ import {
   UserMiddleware,
 } from "./api/shared/middleware/verifyToken";
 import {
-  createSavedList,
-  deleteSavedList,
-  getAllSavedList,
-  getSavedList,
-  updateSavedList,
-} from "./api/routes/SavedList/savedListRoute";
+  createUserItem,
+  deleteUserItem,
+  getAllUserItems,
+  getUserItem,
+  updateUserItem,
+} from "./api/routes/UserItem/userItemRoute";
 
 dotenv.config();
 
@@ -30,11 +30,11 @@ export const endpoints = async (app: express.Application) => {
   app.use(API, UserMiddleware);
 
   //Saved List
-  app.use(API, getAllSavedList);
-  app.use(API, createSavedList);
-  app.use(API, getSavedList);
-  app.use(API, updateSavedList);
-  app.use(API, deleteSavedList);
+  app.use(API, getAllUserItems);
+  app.use(API, createUserItem);
+  app.use(API, getUserItem);
+  app.use(API, updateUserItem);
+  app.use(API, deleteUserItem);
 
   app.get("/", async (req: Request, res: Response) => {
     return sendRes({

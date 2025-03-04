@@ -8,20 +8,18 @@ generator client {
 }
 
 model User {
-    id              String      @id @default(uuid())
-    email           String      @unique
+    id              String     @id @default(uuid())
+    email           String     @unique
     password        String
-    randomPassword  String?
-    type            UserType    @default(USER)
+    type            UserType   @default(USER)
     avatar          String?
     secondaryAvatar String?
     lastSignedIn    DateTime?
     firstName       String
     lastName        String?
-    isEmailVerified Boolean     @default(false)
     items           Item[]
     Token           Token[]
-    savedList       SavedList[]
+    userItems       UserItem[]
 }
 
 model Token {
@@ -33,7 +31,7 @@ model Token {
     user      User     @relation(fields: [userId], references: [id])
 }
 
-model SavedList {
+model UserItem {
     id          String  @id @default(uuid())
     title       String
     description String?

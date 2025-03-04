@@ -5,20 +5,20 @@ import { PrismaClient } from "@prisma/client";
 const router = Router();
 const prisma = new PrismaClient();
 
-export const getAllSavedList = router.get(
-  "/saved-list/:userId",
+export const getAllUserItems = router.get(
+  "/user-item/:userId",
   async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
 
-      const savedLists = await prisma.savedList.findMany({ where: { userId } });
+      const userItems = await prisma.userItem.findMany({ where: { userId } });
 
       return sendRes({
         res,
         code: 200,
         success: true,
-        message: "Fetched saved lists successfully.",
-        data: savedLists,
+        message: "Fetched user items successfully.",
+        data: userItems,
       });
     } catch (error) {
       console.error(error);
@@ -26,14 +26,14 @@ export const getAllSavedList = router.get(
         res,
         code: 500,
         data: null,
-        message: error.message || "Server error while fetching saved lists.",
+        message: error.message || "Server error while fetching user items.",
       });
     }
   }
 );
 
-export const createSavedList = router.post(
-  "/saved-list",
+export const createUserItem = router.post(
+  "/user-item",
   async (req: Request, res: Response) => {
     try {
       const { userId, title, description } = req.body;
@@ -45,11 +45,11 @@ export const createSavedList = router.post(
           res,
           code: 400,
           data: null,
-          message: "All fields (userId, title, destription) are required.",
+          message: "All fields (userId, title, description) are required.",
         });
       }
 
-      const savedList = await prisma.savedList.create({
+      const userItem = await prisma.userItem.create({
         data: { userId, title, description },
       });
 
@@ -57,8 +57,8 @@ export const createSavedList = router.post(
         res,
         code: 201,
         success: true,
-        message: "Saved list created successfully.",
-        data: savedList,
+        message: "User item created successfully.",
+        data: userItem,
       });
     } catch (error) {
       console.error(error);
@@ -66,28 +66,28 @@ export const createSavedList = router.post(
         res,
         code: 500,
         data: null,
-        message: error.message || "Server error while creating saved list.",
+        message: error.message || "Server error while creating user item.",
       });
     }
   }
 );
 
-export const getSavedList = router.get(
-  "/saved-list/:userId/:listId",
+export const getUserItem = router.get(
+  "/user-item/:userId/:itemId",
   async (req: Request, res: Response) => {
     try {
-      const { userId, listId } = req.params;
+      const { userId, itemId } = req.params;
 
-      const savedList = await prisma.savedList.findFirst({
-        where: { id: listId, userId },
+      const userItem = await prisma.userItem.findFirst({
+        where: { id: itemId, userId },
       });
 
-      if (!savedList) {
+      if (!userItem) {
         return sendRes({
           res,
           code: 404,
           data: null,
-          message: "Saved list not found.",
+          message: "User item not found.",
         });
       }
 
@@ -95,8 +95,8 @@ export const getSavedList = router.get(
         res,
         code: 200,
         success: true,
-        message: "Fetched saved list successfully.",
-        data: savedList,
+        message: "Fetched user item successfully.",
+        data: userItem,
       });
     } catch (error) {
       console.error(error);
@@ -104,29 +104,29 @@ export const getSavedList = router.get(
         res,
         code: 500,
         data: null,
-        message: error.message || "Server error while fetching saved list.",
+        message: error.message || "Server error while fetching user item.",
       });
     }
   }
 );
 
-export const updateSavedList = router.patch(
-  "/saved-list",
+export const updateUserItem = router.patch(
+  "/user-item",
   async (req: Request, res: Response) => {
     try {
       const { title, description, id } = req.body;
 
-      const updatedList = await prisma.savedList.update({
+      const updatedItem = await prisma.userItem.update({
         where: { id },
         data: { title, description },
       });
 
-      if (!updatedList) {
+      if (!updatedItem) {
         return sendRes({
           res,
           code: 404,
           data: null,
-          message: "Saved list not found.",
+          message: "User item not found.",
         });
       }
 
@@ -134,8 +134,8 @@ export const updateSavedList = router.patch(
         res,
         code: 200,
         success: true,
-        message: "Saved list updated successfully.",
-        data: updatedList,
+        message: "User item updated successfully.",
+        data: updatedItem,
       });
     } catch (error) {
       console.error(error);
@@ -143,28 +143,28 @@ export const updateSavedList = router.patch(
         res,
         code: 500,
         data: null,
-        message: error.message || "Server error while updating saved list.",
+        message: error.message || "Server error while updating user item.",
       });
     }
   }
 );
 
-export const deleteSavedList = router.delete(
-  "/saved-list",
+export const deleteUserItem = router.delete(
+  "/user-item",
   async (req: Request, res: Response) => {
     try {
-      const { listId } = req.body;
+      const { itemId } = req.body;
 
-      const deletedList = await prisma.savedList.delete({
-        where: { id: listId },
+      const deletedItem = await prisma.userItem.delete({
+        where: { id: itemId },
       });
 
-      if (!deletedList) {
+      if (!deletedItem) {
         return sendRes({
           res,
           code: 404,
           data: null,
-          message: "Saved list not found.",
+          message: "User item not found.",
         });
       }
 
@@ -172,7 +172,7 @@ export const deleteSavedList = router.delete(
         res,
         code: 200,
         success: true,
-        message: "Saved list deleted successfully.",
+        message: "User item deleted successfully.",
       });
     } catch (error) {
       console.error(error);
@@ -180,7 +180,7 @@ export const deleteSavedList = router.delete(
         res,
         code: 500,
         data: null,
-        message: error.message || "Server error while deleting saved list.",
+        message: error.message || "Server error while deleting user item.",
       });
     }
   }
