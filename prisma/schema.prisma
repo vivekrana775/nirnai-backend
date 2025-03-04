@@ -1,0 +1,62 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id              String      @id @default(uuid())
+    email           String      @unique
+    password        String
+    randomPassword  String?
+    type            UserType    @default(USER)
+    avatar          String?
+    secondaryAvatar String?
+    lastSignedIn    DateTime?
+    firstName       String
+    lastName        String?
+    isEmailVerified Boolean     @default(false)
+    items           Item[]
+    Token           Token[]
+    savedList       SavedList[]
+}
+
+model Token {
+    id        String   @id @default(uuid())
+    userId    String
+    token     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id])
+}
+
+model SavedList {
+    id            String @id @default(uuid())
+    name          String
+    responseCodes Json
+    user          User   @relation(fields: [userId], references: [id])
+    userId        String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+enum UserType {
+    ADMIN
+    USER
+}
+
+model Item {
+    id          String   @id @default(uuid())
+    title       String
+    description String?
+    user        User     @relation(fields: [userId], references: [id])
+    userId      String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
