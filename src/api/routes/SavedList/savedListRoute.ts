@@ -42,19 +42,21 @@ export const createSavedList = router.post(
   "/saved-list",
   async (req: Request, res: Response) => {
     try {
-      const { userId, name, responseCodes } = req.body;
+      const { userId, title, description } = req.body;
 
-      if (!userId || !name || !responseCodes) {
+      console.log("user", userId, title, description);
+
+      if (!userId || !title) {
         return sendRes({
           res,
           code: 400,
           data: null,
-          message: "All fields (userId, name, responseCodes) are required.",
+          message: "All fields (userId, title, destription) are required.",
         });
       }
 
       const savedList = await prisma.savedList.create({
-        data: { userId, name, responseCodes },
+        data: { userId, title, description },
       });
 
       return sendRes({
@@ -124,11 +126,11 @@ export const updateSavedList = router.patch(
   "/saved-list",
   async (req: Request, res: Response) => {
     try {
-      const { responseCodes, listId } = req.body;
+      const { title, description, id } = req.body;
 
       const updatedList = await prisma.savedList.update({
-        where: { id: listId },
-        data: { responseCodes },
+        where: { id },
+        data: { title, description },
       });
 
       if (!updatedList) {

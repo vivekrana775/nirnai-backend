@@ -67,7 +67,7 @@ export const UserMiddleware = async (
   const decoded = verifyToken(req, res);
   if (!decoded) return;
 
-  const user = await getUserById(decoded["user"]["id"], res);
+  const user = await getUserById(decoded["userId"], res);
   if (!user) return;
 
   req.user = user;

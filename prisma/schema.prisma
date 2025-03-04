@@ -34,11 +34,11 @@ model Token {
 }
 
 model SavedList {
-    id            String @id @default(uuid())
-    name          String
-    responseCodes Json
-    user          User   @relation(fields: [userId], references: [id])
-    userId        String
+    id          String  @id @default(uuid())
+    title       String
+    description String?
+    user        User    @relation(fields: [userId], references: [id])
+    userId      String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
