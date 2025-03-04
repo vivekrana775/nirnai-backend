@@ -5,9 +5,6 @@ import { PrismaClient } from "@prisma/client";
 const router = Router();
 const prisma = new PrismaClient();
 
-/**
- * Get all saved lists for a user
- */
 export const getAllSavedList = router.get(
   "/saved-list/:userId",
   async (req: Request, res: Response) => {
@@ -35,9 +32,6 @@ export const getAllSavedList = router.get(
   }
 );
 
-/**
- * Create a new saved list
- */
 export const createSavedList = router.post(
   "/saved-list",
   async (req: Request, res: Response) => {
@@ -78,9 +72,6 @@ export const createSavedList = router.post(
   }
 );
 
-/**
- * Get a single saved list by ID
- */
 export const getSavedList = router.get(
   "/saved-list/:userId/:listId",
   async (req: Request, res: Response) => {
@@ -119,9 +110,6 @@ export const getSavedList = router.get(
   }
 );
 
-/**
- * Update a saved list
- */
 export const updateSavedList = router.patch(
   "/saved-list",
   async (req: Request, res: Response) => {
@@ -161,9 +149,6 @@ export const updateSavedList = router.patch(
   }
 );
 
-/**
- * Delete a saved list
- */
 export const deleteSavedList = router.delete(
   "/saved-list",
   async (req: Request, res: Response) => {
