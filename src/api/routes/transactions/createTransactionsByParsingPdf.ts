@@ -171,7 +171,6 @@ const processTransactions = async (rawTransactions: any[]) => {
     try {
       const createdTransaction = await prisma.transaction.create({
         data: transaction,
-        skipDuplicates: true,
       });
       processed.push(createdTransaction);
     } catch (error) {
