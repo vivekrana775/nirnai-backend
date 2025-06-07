@@ -6,26 +6,26 @@ const prisma = new PrismaClient();
 dotenv.config();
 const router = Router();
 
-export const getTransactions = router.get(
+export const deleteTransactions = router.delete(
   "/transactions",
   async (_req: Request, res: Response) => {
     try {
-      const transactions = await prisma.transaction.findMany({});
+      const transactions = await prisma.transaction.deleteMany({});
 
       return sendRes({
         success: true,
         res,
         code: 200,
-        message: "Transactions fetched successfully.",
+        message: "Transactions Deleted successfully.",
         data: transactions,
       });
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+      console.error("Error Deleting transactions:", error);
       return sendRes({
         res,
         code: 500,
         data: null,
-        message: "An error occurred while fetching the transactions.",
+        message: "An error occurred while Deleting the transactions.",
       });
     }
   }

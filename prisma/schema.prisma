@@ -8,14 +8,33 @@ generator client {
 }
 
 model Transaction {
-    id              Int      @id @default(autoincrement())
-    buyer           String
-    seller          String
-    houseNumber     String
-    surveyNumber    String
-    documentNumber  String
-    transactionDate DateTime
-    value           Float
-    originalText    String?
-    createdAt       DateTime @default(now())
+    id              Int     @id @default(autoincrement())
+    srNo            Int?
+    docNoAndYear    String
+    nature          String
+    propertyType    String
+    propertyExtent  String
+    villageStreet   String?
+    street          String?
+    scheduleRemarks String?
+    documentRemarks String?
+    plotNo          String?
+
+    // Arrays stored as JSON
+    dates      Json // Stores the full dates array as JSON
+    executants Json // Array of buyer names as JSON
+    claimants  Json // Array of seller names as JSON
+    surveyNo   Json // Array of survey numbers as JSON
+    prNumber   Json // Array of PR numbers as JSON
+
+    // Numeric values
+    considerationValue Float
+    marketValue        Float
+
+    // Metadata
+    volPageNo String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([docNoAndYear])
 }
