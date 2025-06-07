@@ -3,7 +3,7 @@ import { sendRes } from "../types/response";
 
 import dotenv from "dotenv";
 import { UserMiddleware } from "./api/shared/middleware/verifyToken";
-import { getPdfData } from "./api/routes/transactions/parsePdf";
+import { getPdfData } from "./api/routes/transactions/createTransactionsByParsingPdf";
 import { getTransactions } from "./api/routes/transactions/getTransactions";
 import { deleteTransactions } from "./api/routes/transactions/deleteTransactions";
 
