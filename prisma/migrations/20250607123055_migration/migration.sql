@@ -1,12 +1,12 @@
 -- CreateTable
 CREATE TABLE "Transaction" (
     "id" SERIAL NOT NULL,
-    "srNo" INTEGER NOT NULL,
+    "srNo" INTEGER,
     "docNoAndYear" TEXT NOT NULL,
     "nature" TEXT NOT NULL,
     "propertyType" TEXT NOT NULL,
     "propertyExtent" TEXT NOT NULL,
-    "village" TEXT NOT NULL,
+    "villageStreet" TEXT,
     "street" TEXT,
     "scheduleRemarks" TEXT,
     "documentRemarks" TEXT,
@@ -16,8 +16,8 @@ CREATE TABLE "Transaction" (
     "claimants" JSONB NOT NULL,
     "surveyNo" JSONB NOT NULL,
     "prNumber" JSONB NOT NULL,
-    "considerationValue" DOUBLE PRECISION NOT NULL,
-    "marketValue" DOUBLE PRECISION NOT NULL,
+    "considerationValue" TEXT NOT NULL,
+    "marketValue" TEXT NOT NULL,
     "volPageNo" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -26,4 +26,4 @@ CREATE TABLE "Transaction" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Transaction_srNo_docNoAndYear_key" ON "Transaction"("srNo", "docNoAndYear");
+CREATE UNIQUE INDEX "Transaction_docNoAndYear_key" ON "Transaction"("docNoAndYear");
