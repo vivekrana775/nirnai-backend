@@ -21,7 +21,9 @@ npm install
 
 ```
 DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<database>?schema=public
-PORT=3000
+PORT=8000
+SESSION_SECRET = any_secrect_key
+GOOGLE_API_KEY = your_key
 ```
 
 4. **Generate Prisma client:**
