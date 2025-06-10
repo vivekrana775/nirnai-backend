@@ -7,7 +7,7 @@ dotenv.config();
 const router = Router();
 
 export const getTransactions = router.get(
-  "/transactions",
+  "/transaction",
   async (req: Request, res: Response) => {
     try {
       // Extract query parameters
@@ -94,16 +94,11 @@ export const getTransactions = router.get(
       }
 
       // Calculate pagination
-      const pageNumber = Number(page);
-      const pageSize = Number(limit);
-      const skip = (pageNumber - 1) * pageSize;
 
       // Get transactions with filters
       const [transactions, totalCount] = await Promise.all([
         prisma.transaction.findMany({
           where,
-          skip,
-          take: pageSize,
         }),
         prisma.transaction.count({ where }),
       ]);
@@ -117,9 +112,6 @@ export const getTransactions = router.get(
           transactions,
           pagination: {
             total: totalCount,
-            page: pageNumber,
-            pageSize,
-            totalPages: Math.ceil(totalCount / pageSize),
           },
         },
       });

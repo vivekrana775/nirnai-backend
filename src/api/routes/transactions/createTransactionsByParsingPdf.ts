@@ -15,15 +15,10 @@ const router = Router();
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const geminiFlash = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Initialize Google Translate
-const translate = new Translate({
-  key: process.env.GOOGLE_API_KEY,
-});
-
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 }, // Increased file size limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
       cb(null, true);
@@ -34,7 +29,7 @@ const upload = multer({
 });
 
 export const getPdfData = router.post(
-  "/transactions/upload",
+  "/transaction/upload",
   upload.single("file"),
   async (req: any, res: Response) => {
     try {
@@ -48,19 +43,21 @@ export const getPdfData = router.post(
         });
       }
 
-      // Extract text from PDF
-      const pdfText = await extractTextFromPdf(req.file.buffer);
+      // 1. Extract and chunk the text
+      const textChunks = await extractAndChunkTextFromPdf(req.file.buffer);
 
-      // Use AI to clean and structure the raw text
-      const cleanedText = await cleanTextWithAI(pdfText);
+      let allTransactions = [];
 
-      // Parse transactions with AI assistance
-      const transactions = await parseTransactionsWithAI(cleanedText);
+      // 2. Process each chunk with the AI
+      for (const chunk of textChunks) {
+        const transactions = await parseTransactionsWithAI(chunk);
+        if (transactions.length > 0) {
+          allTransactions.push(...transactions);
+        }
+      }
 
-      console.log("transactions", transactions);
-
-      // Translate only specific fields that need translation
-      const processedTransactions = await processTransactions(transactions);
+      // 3. Save all transactions to the database
+      const processedTransactions = await processTransactions(allTransactions);
 
       return sendRes({
         success: true,
@@ -84,46 +81,30 @@ export const getPdfData = router.post(
 );
 
 // Helper functions
-async function extractTextFromPdf(pdfBuffer: Buffer): Promise<string> {
+
+async function extractAndChunkTextFromPdf(
+  pdfBuffer: Buffer
+): Promise<string[]> {
   const data = await pdf(pdfBuffer);
-  return data.text;
-}
+  const text = data.text;
+  const chunkSize = 8000; // Define a chunk size (in characters)
+  const overlap = 500; // Define overlap to avoid cutting data in the middle
+  const chunks = [];
 
-async function translateText(text: string): Promise<string> {
-  if (!text.trim()) return text;
-  const [translation] = await translate.translate(text, "en");
-  return translation;
-}
-
-async function cleanTextWithAI(text: string): Promise<string> {
-  const prompt = `
-  You are a document processing assistant. Below is raw text extracted from a Tamil Nadu property transaction PDF. 
-  Please clean and structure this text and convert it to English while preserving all data points:
-  
-  1. Remove headers/footers/page numbers
-  2. Fix line breaks that break up data fields
-  3. Identify and separate individual transactions
-  4. Preserve all numbers, dates, names, and property details
-  
-  Raw text:
-  ${text}
-  
-  Return ONLY the cleaned text with no additional commentary.
-  `;
-
-  const result = await geminiFlash.generateContent(prompt);
-  const response = await result.response;
-  return response.text();
+  for (let i = 0; i < text.length; i += chunkSize - overlap) {
+    chunks.push(text.substring(i, i + chunkSize));
+  }
+  return chunks;
 }
 
 const parseTransactionsWithAI = async (text: string) => {
   const prompt = `
   You are an expert at parsing Tamil Nadu property transaction documents. 
-  Extract all transactions and each parameter of transaction from the following text and return them as a JSON array.
+  Extract all transactions each parameter of transaction from the following text and return them as a JSON array.
   
   Each transaction should have these fields:
-  - srNo: Serial Number
-  - docNoAndYear: Document No.& Year
+  - srNo: Serial Number (Int)
+  - docNoAndYear: Document No.& Year (String)
   - dates: Date of Execution & Date of Presentation & Date of Registration (Array of strings)
   - nature: Nature of document 
   - executants: Names of executants (buyers) (Array of Strings)
@@ -134,49 +115,51 @@ const parseTransactionsWithAI = async (text: string) => {
   - prNumber: PR Number (Array of strings)
   - documentRemarks: Document Remarks (String)
   - propertyType: Property Type (Type of property)
-  - propertyExtent: Property Extent (Extent of property)
+  - propertyExtent: Property Extent (String)
   - villageStreet: Village & Street (Village and street details)
   - surveyNo: Survey No (Array of String)
   - plotNo: Plot number
   - scheduleRemarks: Any remarks
   
-  Return ONLY the JSON array with no additional text or explanation.
+  Return ONLY the JSON array with no additional text or explanation and convert tamil text to english. If no transactions are found in this chunk, return an empty array [].
   
   Text to parse:
   ${text}
   `;
 
-  const result = await geminiFlash.generateContent(prompt);
-  const response = await result.response;
-
   try {
-    // Gemini sometimes adds markdown formatting, so we need to clean it
+    const result = await geminiFlash.generateContent(prompt);
+    const response = await result.response;
+
     const jsonString = response
       .text()
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
+
     const parsed = JSON.parse(jsonString);
     return Array.isArray(parsed) ? parsed : parsed.transactions || [];
   } catch (e) {
     console.error("Failed to parse AI response:", e);
+    // Return an empty array on error to avoid crashing the whole process
     return [];
   }
 };
 
 const processTransactions = async (rawTransactions: any[]) => {
   const processed = [];
-
   for (let transaction of rawTransactions) {
     try {
-      const createdTransaction = await prisma.transaction.create({
-        data: transaction,
-      });
-      processed.push(createdTransaction);
+      // Basic validation to avoid saving empty objects
+      if (transaction.docNoAndYear) {
+        const createdTransaction = await prisma.transaction.create({
+          data: transaction,
+        });
+        processed.push(createdTransaction);
+      }
     } catch (error) {
-      console.log("error creating transaction", error);
+      console.log("Error creating transaction:", error.message);
     }
   }
-
   return processed;
 };

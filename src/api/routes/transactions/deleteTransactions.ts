@@ -7,7 +7,7 @@ dotenv.config();
 const router = Router();
 
 export const deleteTransactions = router.delete(
-  "/transactions",
+  "/transaction",
   async (_req: Request, res: Response) => {
     try {
       const transactions = await prisma.transaction.deleteMany({});

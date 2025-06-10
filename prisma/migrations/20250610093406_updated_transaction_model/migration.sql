@@ -1,0 +1,15 @@
+-- DropIndex
+DROP INDEX "Transaction_docNoAndYear_key";
+
+-- AlterTable
+ALTER TABLE "Transaction" ALTER COLUMN "docNoAndYear" DROP NOT NULL,
+ALTER COLUMN "nature" DROP NOT NULL,
+ALTER COLUMN "propertyType" DROP NOT NULL,
+ALTER COLUMN "propertyExtent" DROP NOT NULL,
+ALTER COLUMN "dates" DROP NOT NULL,
+ALTER COLUMN "executants" DROP NOT NULL,
+ALTER COLUMN "claimants" DROP NOT NULL,
+ALTER COLUMN "surveyNo" DROP NOT NULL,
+ALTER COLUMN "prNumber" DROP NOT NULL,
+ALTER COLUMN "considerationValue" DROP NOT NULL,
+ALTER COLUMN "marketValue" DROP NOT NULL;
