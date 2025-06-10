@@ -18,7 +18,7 @@ const geminiFlash = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 }, // Increased file size limit
+  limits: { fileSize: 25 * 1024 * 1024 }, //25 mb
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
       cb(null, true);

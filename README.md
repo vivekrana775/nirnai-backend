@@ -65,3 +65,12 @@ npm run start
 ```bash
 npx prisma studio
 ```
+
+- **Working:**
+
+So Basically what I am doing is taking a pdf from api and giving it to pdf-parse to extract text from the pdf.
+Then, for larger pdf's or large amount of text, I'm creating chunks of text and giving it to ai.
+
+Giving data to AI in chunks is very helpful in this process. This way we do not need to use a pro version of AI, We can simply use any free AI.
+
+In this we are using gemini-1.5-flash.
