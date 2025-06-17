@@ -46,6 +46,16 @@ export const getPdfData = router.post(
       // 1. Extract and chunk the text
       const textChunks = await extractAndChunkTextFromPdf(req.file.buffer);
 
+      sendRes({
+        success: true,
+        res: res,
+        code: 202,
+        message: "PDF processed successfully",
+        data: {
+          processedTransactions: [],
+        },
+      });
+
       let allTransactions = [];
 
       // 2. Process each chunk with the AI
@@ -58,16 +68,6 @@ export const getPdfData = router.post(
 
       // 3. Save all transactions to the database
       const processedTransactions = await processTransactions(allTransactions);
-
-      return sendRes({
-        success: true,
-        res: res,
-        code: 200,
-        message: "PDF processed successfully",
-        data: {
-          processedTransactions,
-        },
-      });
     } catch (error) {
       console.error(error);
       return sendRes({
